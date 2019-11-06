@@ -1,0 +1,10 @@
+.idea/
+*.iml
+/target/
+/logs/
+/nb-configuration.xml
+/nbactions-App.xml
+/nbactions-MainFrame.xml
+/LinuxJavaChangeWindow/nbproject/private/
+/LinuxJavaChangeWindow/build/
+nbactions.xml
