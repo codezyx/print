@@ -20,8 +20,9 @@ public class PageHeader implements IEventHandler {
         Rectangle pageSize = page.getPageSize();
         PdfCanvas pdfCanvas = new PdfCanvas(page.getLastContentStream(), page.getResources(), pdf);
         Canvas canvas = new Canvas(pdfCanvas, pdf, pageSize);
+        canvas.setFont(PdfUtil.SONG_TI_FONT);
         float x = (pageSize.getLeft() + pageSize.getRight()) / 2;
-        float y = pageSize.getTop() + 15;
+        float y = pageSize.getTop() - 65;
         String pageNumString = "第" + pdf.getPageNumber(page) + "页";
         canvas.showTextAligned(pageNumString, x, y, TextAlignment.CENTER);
     }

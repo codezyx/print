@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Executable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public enum PdfUtil {
@@ -37,10 +37,80 @@ public enum PdfUtil {
 
     public static void main(String[] args) {
         List<String[]> list = CSVUtil.INSTANCE.readAll("C:\\Users\\user\\Desktop\\histable.csv");
-        PdfUtil.INSTANCE.createPdf(list, Arrays.asList(0, 1, 2, 3, 4), "C:\\Users\\user\\Desktop\\test.pdf");
+        PdfUtil.INSTANCE.createDoc(list, "C:\\Users\\user\\Desktop\\test.pdf");
     }
 
-    public void print() {
+    public void createDoc(List<String[]> data, String pdfFile) {
+        Document doc = null;
+        try {
+            PdfDocument pdfDocument = new PdfDocument(new PdfWriter(pdfFile));
+            pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
+            pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
+            doc = new Document(pdfDocument, PageSize.A4);
+            doc.setTopMargin(72);
+            doc.setFont(SONG_TI_FONT);
+            doc.setFontSize(8);
+
+            addTable(doc, data);
+
+        } catch (Exception e) {
+            LOGGER.error("Error to write pdf ", e);
+        } finally {
+            if (null != doc) {
+                doc.close();
+            }
+        }
+    }
+
+    public void addTable(Document doc, List<String[]> data) {
+        if (null == data || data.isEmpty() || null == doc) {
+            return;
+        }
+        // table header 分组
+        String[] headers = data.get(FIRST_INDEX);
+        int headerSize = headers.length;
+        List<List<Integer>> headerList = new ArrayList<>();
+        int tableColumnSize = 8;
+        List<Integer> oneHeader = new ArrayList<>(tableColumnSize);
+        for (int i = 1; i < headerSize; i++) {
+            if (i % 7 != 0) {
+                oneHeader.add(i);
+            } else {
+                oneHeader.add(i);
+                oneHeader.add(FIRST_INDEX);
+                Collections.sort(oneHeader);
+                headerList.add(oneHeader);
+                oneHeader = new ArrayList<>(tableColumnSize);
+            }
+        }
+        if (!oneHeader.isEmpty()) {
+            oneHeader.add(FIRST_INDEX);
+            Collections.sort(oneHeader);
+            headerList.add(oneHeader);
+        }
+        if (!headerList.isEmpty()) {
+            for (List<Integer> index : headerList) {
+                doc.add(createOnePageTable(data, index));
+            }
+        }
+    }
+
+    private Table createOnePageTable(List<String[]> data, List<Integer> indexes) {
+        Table table = new Table(indexes.size());
+        table.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        table.setTextAlignment(TextAlignment.CENTER).setHorizontalAlignment(HorizontalAlignment.CENTER);
+        for (int i = 0; i < data.size(); i++) {
+            String[] row = data.get(i);
+            if (isNotEmpty(row)) {
+                for (int j = 0; j < indexes.size(); j++) {
+                    Cell cell = new Cell();
+                    cell.setWidth((j == 0) ? 100 : 50);
+                    cell.add(new Paragraph(row[indexes.get(j)]));
+                    table.addCell(cell);
+                }
+            }
+        }
+        return table;
     }
 
     public void createPdf(List<String[]> data, List<Integer> indexes, String pdfFile) {
@@ -48,10 +118,12 @@ public enum PdfUtil {
         try {
             PdfDocument pdfDocument = new PdfDocument(new PdfWriter(pdfFile));
             pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
-//            pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
+            pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
             doc = new Document(pdfDocument, PageSize.A4);
+            doc.setTopMargin(72);
             doc.setFont(SONG_TI_FONT);
             doc.setFontSize(8);
+
             Table table = createTable(data, indexes);
             if (null != table) {
                 doc.add(table);
@@ -70,12 +142,14 @@ public enum PdfUtil {
             return null;
         }
         Table table = new Table(indexes.size());
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setTextAlignment(TextAlignment.CENTER).setHorizontalAlignment(HorizontalAlignment.CENTER);
         // 添加表头
         String[] headers = data.get(FIRST_INDEX);
-        for (Integer index : indexes) {
+        for (int i = 0; i < indexes.size(); i++) {
+            Integer index = indexes.get(i);
             Cell cell = new Cell();
-//            cell.setPaddingLeft(20);
+            cell.setWidth((i == 0) ? 100 : 50);
             cell.add(new Paragraph(headers[index]));
             table.addHeaderCell(cell);
         }

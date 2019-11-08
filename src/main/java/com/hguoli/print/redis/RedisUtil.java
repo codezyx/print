@@ -1,4 +1,4 @@
-package com.hguoli.print;
+package com.hguoli.print.redis;
 
 
 import org.slf4j.Logger;
@@ -39,8 +39,8 @@ public enum RedisUtil {
             String pwdStr = properties.getProperty("redis.password");
             String pwd = (null == pwdStr || "".equals(pwdStr)) ? null : pwdStr;
             String host = properties.getProperty("redis.host");
-            int port = Integer.valueOf(properties.getProperty("redis.port"));
-            int timeout = Integer.valueOf(properties.getProperty("redis.connect.timeout"));
+            int port = Integer.parseInt(properties.getProperty("redis.port"));
+            int timeout = Integer.parseInt(properties.getProperty("redis.connect.timeout"));
             pool = new JedisPool(jedisPoolConfig, host, port, timeout, pwd);
             LOGGER.info("Init Jedis Pool succeed on " + host + ":" + port);
         } catch (Exception e) {

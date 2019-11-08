@@ -57,7 +57,6 @@ public enum CSVUtil {
             FileInputStream fileInputStream = new FileInputStream(new File(csvFile));
             csvReader = new CSVReader(new InputStreamReader(fileInputStream, "gbk"));
             result = csvReader.readAll();
-            result.forEach(it -> System.out.println(Arrays.toString(it)));
         } catch (Exception e) {
             LOGGER.error("Error to read CSV: " + csvFile, e);
         } finally {

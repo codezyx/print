@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public enum PrintUtil {
 
@@ -22,7 +23,30 @@ public enum PrintUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrintUtil.class);
 
     public static void main(String[] args) {
-        PrintUtil.INSTANCE.print("c:/Users/user/Desktop/test.pdf");
+        PrintUtil.INSTANCE.print3("c:/Users/user/Desktop/test.pdf");
+    }
+
+    public void print3(String pdfFile) {
+        PrintService service = PrintServiceLookup.lookupDefaultPrintService();
+        int count = 0;
+        for (DocFlavor docFlavor : service.getSupportedDocFlavors()) {
+            if (docFlavor.toString().contains("pdf")) {
+                count++;
+            }
+        }
+        if (count == 0) {
+            System.out.println("PDF not supported by printer: " + service.getName());
+            LOGGER.error("PDF not supported by printer: " + service.getName());
+        } else {
+            try {
+                FileInputStream in = new FileInputStream(pdfFile);
+                Doc doc = new SimpleDoc(in, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+                service.createPrintJob().print(doc, null);
+            } catch (Exception e) {
+                System.out.println("Error to print!"+ e.getMessage());
+                LOGGER.error("Error to print!", e);
+            }
+        }
     }
 
     public void linuxCommandPrint(String pdfFile) {
@@ -67,6 +91,9 @@ public enum PrintUtil {
         PrintService printService = null;
         if (services != null && services.length > 0) {
             printService = services[0];
+            DocFlavor[] supportedDocFlavors = printService.getSupportedDocFlavors();
+            System.out.println("supportedDocFlavors " + Arrays.toString(supportedDocFlavors));
+
             LOGGER.info(printService.getName());
         }
 

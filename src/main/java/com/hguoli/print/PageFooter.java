@@ -20,8 +20,8 @@ public class PageFooter implements IEventHandler {
         PdfCanvas pdfCanvas = new PdfCanvas(page.getLastContentStream(), page.getResources(), pdf);
         Canvas canvas = new Canvas(pdfCanvas, pdf, pageSize);
         float x = (pageSize.getLeft() + pageSize.getRight()) / 2;
-        canvas.setFont(PdfUtil.INSTANCE.SONG_TI_FONT);
-        float y = pageSize.getBottom() + 15;
+        canvas.setFont(PdfUtil.SONG_TI_FONT);
+        float y = pageSize.getBottom() +15;
         String pageNumString = "第" + pdf.getPageNumber(page) + "页";
         canvas.showTextAligned(pageNumString, x, y, TextAlignment.CENTER);
     }

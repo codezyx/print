@@ -2,6 +2,8 @@ package com.hguoli.print;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 public enum ConfigCache {
@@ -10,7 +12,6 @@ public enum ConfigCache {
 
     private String pdfTmpDir;
     private String csvFilePath;
-
     private String redisHost;
     private Integer redisPort = 6379;
     private String redisPassword;
@@ -19,16 +20,18 @@ public enum ConfigCache {
     private Integer redisMaxWait;
     private Integer redisMaxIdle;
     private Integer redisMinIdle;
+    private String redisChannelName;
 
     /**
      * 读取config.properties
      */
     public void load() throws Exception {
         Properties properties = new Properties();
-        String file = System.getenv("APP_HOME") + File.separator + "conf" + File.separator + "config.properties";
-        FileInputStream fileInputStream = new FileInputStream(file);
-        properties.load(fileInputStream);
-        fileInputStream.close();
+//        String file = System.getenv("APP_HOME") + File.separator + "conf" + File.separator + "config.properties";
+//        String file="config.properties";
+        InputStream resourceAsStream = ConfigCache.class.getResourceAsStream("/config.properties");
+        properties.load(resourceAsStream);
+        resourceAsStream.close();
         setPdfTmpDir(properties.getProperty("pdf.tmp.dir"));
         setCsvFilePath(properties.getProperty("csv.file.path"));
         setRedisHost(properties.getProperty("redis.host"));
@@ -37,6 +40,7 @@ public enum ConfigCache {
         setRedisMaxWait(Integer.parseInt(properties.getProperty("redis.pool.max-wait")));
         setRedisMaxIdle(Integer.parseInt(properties.getProperty("redis.pool.max-idle")));
         setRedisMinIdle(Integer.parseInt(properties.getProperty("redis.pool.min-idle")));
+        setRedisChannelName(properties.getProperty("redis.channel.name"));
     }
 
     public String getPdfTmpDir() {
@@ -119,4 +123,28 @@ public enum ConfigCache {
         this.redisMinIdle = redisMinIdle;
     }
 
+    public String getRedisChannelName() {
+        return redisChannelName;
+    }
+
+    public void setRedisChannelName(String redisChannelName) {
+        this.redisChannelName = redisChannelName;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigCache{" +
+                "pdfTmpDir='" + pdfTmpDir + '\'' +
+                ", csvFilePath='" + csvFilePath + '\'' +
+                ", redisHost='" + redisHost + '\'' +
+                ", redisPort=" + redisPort +
+                ", redisPassword='" + redisPassword + '\'' +
+                ", redisTimeout=" + redisTimeout +
+                ", redisMaxActive=" + redisMaxActive +
+                ", redisMaxWait=" + redisMaxWait +
+                ", redisMaxIdle=" + redisMaxIdle +
+                ", redisMinIdle=" + redisMinIdle +
+                ", redisChannelName='" + redisChannelName + '\'' +
+                '}';
+    }
 }
