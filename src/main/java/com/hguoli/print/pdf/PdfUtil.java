@@ -1,5 +1,6 @@
-package com.hguoli.print;
+package com.hguoli.print.pdf;
 
+import com.hguoli.print.util.CSVUtil;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -15,7 +16,7 @@ import com.itextpdf.layout.property.TextAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,36 +26,28 @@ public enum PdfUtil {
     INSTANCE;
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfUtil.class);
     private static final int FIRST_INDEX = 0;
-    public static PdfFont SONG_TI_FONT = null;
-
-    static {
-        try {
-            SONG_TI_FONT = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
-        } catch (IOException e) {
-            LOGGER.error("Error to init STSong-Light font!", e);
-        }
-    }
 
     public static void main(String[] args) {
         List<String[]> list = CSVUtil.INSTANCE.readAll("C:\\Users\\user\\Desktop\\histable.csv");
         PdfUtil.INSTANCE.createDoc(list, "C:\\Users\\user\\Desktop\\test.pdf");
     }
 
-    public void createDoc(List<String[]> data, String pdfFile) {
+    public boolean createDoc(List<String[]> data, String pdfFile) {
         Document doc = null;
         try {
             PdfDocument pdfDocument = new PdfDocument(new PdfWriter(pdfFile));
-            pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
-            pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
+//            pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
+//            pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
             doc = new Document(pdfDocument, PageSize.A4);
+            PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
+            doc.setFont(font);
             doc.setTopMargin(72);
-            doc.setFont(SONG_TI_FONT);
             doc.setFontSize(8);
-
             addTable(doc, data);
-
+            return true;
         } catch (Exception e) {
             LOGGER.error("Error to write pdf ", e);
+            return false;
         } finally {
             if (null != doc) {
                 doc.close();
@@ -73,7 +66,7 @@ public enum PdfUtil {
         int tableColumnSize = 8;
         List<Integer> oneHeader = new ArrayList<>(tableColumnSize);
         for (int i = 1; i < headerSize; i++) {
-            if (i % 7 != 0) {
+            if ((i % (tableColumnSize - 1)) != 0) {
                 oneHeader.add(i);
             } else {
                 oneHeader.add(i);
@@ -99,8 +92,7 @@ public enum PdfUtil {
         Table table = new Table(indexes.size());
         table.setHorizontalAlignment(HorizontalAlignment.LEFT);
         table.setTextAlignment(TextAlignment.CENTER).setHorizontalAlignment(HorizontalAlignment.CENTER);
-        for (int i = 0; i < data.size(); i++) {
-            String[] row = data.get(i);
+        for (String[] row : data) {
             if (isNotEmpty(row)) {
                 for (int j = 0; j < indexes.size(); j++) {
                     Cell cell = new Cell();
@@ -113,6 +105,19 @@ public enum PdfUtil {
         return table;
     }
 
+    public boolean deleteOldPdf(String pdf) {
+        File file = new File(pdf);
+        if (file.exists()) {
+            try {
+                return file.delete();
+            } catch (Exception e) {
+                LOGGER.error("Error to delete old pdf!", e);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void createPdf(List<String[]> data, List<Integer> indexes, String pdfFile) {
         Document doc = null;
         try {
@@ -120,8 +125,9 @@ public enum PdfUtil {
             pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
             pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new PageHeader());
             doc = new Document(pdfDocument, PageSize.A4);
+            PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
+            doc.setFont(font);
             doc.setTopMargin(72);
-            doc.setFont(SONG_TI_FONT);
             doc.setFontSize(8);
 
             Table table = createTable(data, indexes);

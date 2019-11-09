@@ -1,6 +1,6 @@
 package com.hguoli.print.redis;
 
-import com.hguoli.print.ConfigCache;
+import com.hguoli.print.util.ConfigCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

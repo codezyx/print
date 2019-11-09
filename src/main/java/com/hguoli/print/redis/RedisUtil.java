@@ -1,13 +1,13 @@
 package com.hguoli.print.redis;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.Map;
 import java.util.Properties;
 
 public enum RedisUtil {
@@ -15,7 +15,6 @@ public enum RedisUtil {
     INSTANCE;
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisUtil.class);
     private JedisPool pool;
-    private Map<String,String> keys;
 
     /**
      * 销毁JedisPool
@@ -32,19 +31,20 @@ public enum RedisUtil {
     public void initJedisPool(Properties properties) {
         try {
             JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-            jedisPoolConfig.setMaxIdle(Integer.parseInt(properties.getProperty("redis.max.idle")));
-            jedisPoolConfig.setMaxWaitMillis(Integer.parseInt(properties.getProperty("redis.max.wait")));
-            jedisPoolConfig.setMaxTotal(Integer.parseInt(properties.getProperty("redis.max.active")));
-            jedisPoolConfig.setMinIdle(Integer.parseInt(properties.getProperty("redis.min.idle")));
+            jedisPoolConfig.setMaxIdle(Integer.parseInt(properties.getProperty("redis.pool.max-idle")));
+            jedisPoolConfig.setMaxWaitMillis(Integer.parseInt(properties.getProperty("redis.pool.max-wait")));
+            jedisPoolConfig.setMaxTotal(Integer.parseInt(properties.getProperty("redis.pool.max-active")));
+            jedisPoolConfig.setMinIdle(Integer.parseInt(properties.getProperty("redis.pool.min-idle")));
             String pwdStr = properties.getProperty("redis.password");
             String pwd = (null == pwdStr || "".equals(pwdStr)) ? null : pwdStr;
             String host = properties.getProperty("redis.host");
-            int port = Integer.parseInt(properties.getProperty("redis.port"));
+            String portStr = properties.getProperty("redis.port");
+            int port = StringUtils.isNotEmpty(portStr) ? Integer.parseInt(portStr) : 6379;
             int timeout = Integer.parseInt(properties.getProperty("redis.connect.timeout"));
             pool = new JedisPool(jedisPoolConfig, host, port, timeout, pwd);
-            LOGGER.info("Init Jedis Pool succeed on " + host + ":" + port);
+            LOGGER.info("---Initialized Jedis Pool on " + host + ":" + port);
         } catch (Exception e) {
-            LOGGER.error("Init Jedis Pool failed!", e);
+            LOGGER.error("---Failed to Initialize Jedis Pool !", e);
         }
     }
 
@@ -86,12 +86,12 @@ public enum RedisUtil {
         }
     }
 
-    public Map<String, String> getKeys() {
-        return keys;
+    public JedisPool getPool() {
+        return pool;
     }
 
-    public void setKeys(Map<String, String> keys) {
-        this.keys = keys;
+    public void setPool(JedisPool pool) {
+        this.pool = pool;
     }
 }
 

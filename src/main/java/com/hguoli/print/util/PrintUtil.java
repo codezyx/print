@@ -1,21 +1,16 @@
-package com.hguoli.print;
+package com.hguoli.print.util;
 
 
 import org.apache.pdfbox.PrintPDF;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import java.awt.print.PrinterJob;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
 public enum PrintUtil {
 
@@ -43,7 +38,7 @@ public enum PrintUtil {
                 Doc doc = new SimpleDoc(in, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
                 service.createPrintJob().print(doc, null);
             } catch (Exception e) {
-                System.out.println("Error to print!"+ e.getMessage());
+                System.out.println("Error to print!" + e.getMessage());
                 LOGGER.error("Error to print!", e);
             }
         }
@@ -72,8 +67,6 @@ public enum PrintUtil {
     }
 
     public void print(String pdfFile) {
-
-
         FileInputStream psStream = null;
         try {
             psStream = new FileInputStream(pdfFile);
@@ -91,9 +84,6 @@ public enum PrintUtil {
         PrintService printService = null;
         if (services != null && services.length > 0) {
             printService = services[0];
-            DocFlavor[] supportedDocFlavors = printService.getSupportedDocFlavors();
-            System.out.println("supportedDocFlavors " + Arrays.toString(supportedDocFlavors));
-
             LOGGER.info(printService.getName());
         }
 
