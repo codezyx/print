@@ -29,7 +29,7 @@ public class PdfService {
     }
 
     private static void openPdf(String pdf) {
-        String[] cmd = {"sh", "-c", "evince " + pdf};
+        String[] cmd = {"sh", "-c", "evince " + pdf + " &"};
         try {
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
