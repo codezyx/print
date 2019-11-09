@@ -1,1 +1,1 @@
-java -jar -Dfile.encoding=GBK -XX:+UseG1GC -Xbootclasspath/a:/users/ems/print/conf /users/ems/print/lib/print-1.0.jar
+java -jar -Dfile.encoding=GBK -XX:+UseG1GC -Xbootclasspath/a:/users/ems/gls5000/print/conf /users/ems/gls5000/print/lib/print-1.0.jar
