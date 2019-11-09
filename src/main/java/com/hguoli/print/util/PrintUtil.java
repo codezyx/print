@@ -1,7 +1,6 @@
 package com.hguoli.print.util;
 
 
-import org.apache.pdfbox.PrintPDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,19 +49,6 @@ public enum PrintUtil {
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
             LOGGER.error("Error to execute lpr command!", e);
-        }
-    }
-
-    public void print2(String pdfFile) {
-        try {
-            PrintPDF.main(new String[]{
-                    "-silentPrint",//静默打印
-                    "-printerName", "HL-1208",//指定打印机名
-                    "-orientation", "portrait",//打印方向，三种可选
-                    "/users/ems/test.pdf"//打印PDF文档的路径
-            });
-        } catch (Exception e) {
-            LOGGER.error("Error to print!", e);
         }
     }
 
