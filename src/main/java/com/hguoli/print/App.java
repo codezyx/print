@@ -1,8 +1,6 @@
 package com.hguoli.print;
 
 import com.hguoli.print.pdf.PdfService;
-import com.hguoli.print.redis.RedisUtil;
-import com.hguoli.print.redis.SubscribeThread;
 import com.hguoli.print.util.ConfigCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
