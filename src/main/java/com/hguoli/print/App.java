@@ -1,5 +1,6 @@
 package com.hguoli.print;
 
+import com.hguoli.print.pdf.PdfService;
 import com.hguoli.print.redis.RedisUtil;
 import com.hguoli.print.redis.SubscribeThread;
 import com.hguoli.print.util.ConfigCache;
@@ -23,8 +24,6 @@ public class App {
             properties.load(resourceAsStream);
             ConfigCache.CACHE.load(properties);// 读取配置文件到缓存
             LOGGER.info("---Loaded configuration: " + ConfigCache.CACHE);
-            LOGGER.info("2. Initializing jedis pool...");
-            RedisUtil.INSTANCE.initJedisPool(properties);// 初始化redis pool
         } catch (Exception e) {
             LOGGER.error("Error to start App!", e);
             System.exit(1);
@@ -37,9 +36,8 @@ public class App {
                 }
             }
         }
-        LOGGER.info("3. Starting redis subscriber.");
-        SubscribeThread subscribeThread = new SubscribeThread(RedisUtil.INSTANCE.getPool());
-        subscribeThread.start();
+        LOGGER.info("3. Building pdf.");
+        new PdfService().service();
     }
 
 }
